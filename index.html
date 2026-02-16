@@ -216,6 +216,34 @@
             pointer-events: none;
         }
 
+        /* Polygon Styles */
+        .polygon-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 20;
+        }
+        
+        .polygon-point {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border: 2px solid #e8a798;
+            border-radius: 50%;
+            cursor: move;
+            transform: translate(-50%, -50%);
+            z-index: 30;
+            pointer-events: auto;
+        }
+        
+        .polygon-point:hover {
+            background: #e8a798;
+        }
+
         .selection-tooltip {
             position: absolute;
             inset: 0;
@@ -229,6 +257,53 @@
 
         .selection-container:hover .selection-tooltip {
             opacity: 1;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            margin-left: 10px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #e8a798;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(20px);
         }
     /* Loading overlay styles */
     .loading-overlay {
@@ -322,8 +397,13 @@
         <div class="w-1 h-[30px] rounded-[2px] bg-cAccent mr-[15px]"></div>
         <span class="font-bold text-cPrimary text-[14px] mr-4">工作台</span>
         
-        <div id="mode-indicator" class="hidden h-6 w-[120px] rounded bg-cBg border border-cLight items-center justify-center ml-[10px]">
-            <span id="mode-text" class="text-[10px] text-cSecondary">模式: 自动检测</span>
+        <div id="mode-indicator" class="hidden h-6 rounded bg-cBg border border-cLight items-center justify-center ml-[10px] px-2 gap-2">
+            <span class="text-[10px] text-cSecondary">矩形</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="mode-switch">
+                <span class="slider"></span>
+            </label>
+            <span class="text-[10px] text-cSecondary">多边形</span>
         </div>
 
         <div class="flex-1"></div>
@@ -357,6 +437,13 @@
                         <div class="selection-corner corner-bl"></div>
                         <div class="selection-corner corner-br"></div>
                     </div>
+                    
+                    <!-- Polygon SVG Layer -->
+                    <svg id="polygon-svg" class="hidden polygon-svg">
+                        <polygon id="polygon-shape" points="" fill="rgba(232, 167, 152, 0.3)" stroke="#e8a798" stroke-width="2" />
+                        <line id="polygon-preview-line" x1="0" y1="0" x2="0" y2="0" stroke="#e8a798" stroke-width="2" stroke-dasharray="4" class="hidden" />
+                    </svg>
+                    <div id="polygon-points-container"></div>
                     
                     <!-- Tooltip -->
                     <div id="selection-tooltip" class="selection-tooltip">
@@ -409,6 +496,11 @@
         let selection = null; // { x, y, w, h } in pixels relative to displayed image
         let isDrawing = false;
         let startPos = null; // { x, y }
+        
+        // Polygon state
+        let isPolygonMode = false;
+        let polygonPoints = []; // Array of {x, y}
+        let draggedPointIndex = -1;
 
         // Get DOM elements
         const btnAction = document.getElementById('btn-action');
@@ -424,11 +516,14 @@
         const statusDot = document.getElementById('status-dot');
         const statusText = document.getElementById('status-text');
         const modeIndicator = document.getElementById('mode-indicator');
-        const modeText = document.getElementById('mode-text');
+        const modeSwitch = document.getElementById('mode-switch');
         const selectionContainer = document.getElementById('selection-container');
         const selectionBox = document.getElementById('selection-box');
         const selectionOverlay = document.getElementById('selection-overlay');
         const selectionTooltip = document.getElementById('selection-tooltip');
+        const polygonSvg = document.getElementById('polygon-svg');
+        const polygonShape = document.getElementById('polygon-shape');
+        const polygonPointsContainer = document.getElementById('polygon-points-container');
         const loadingOverlay = document.getElementById('loading-overlay');
         const loadingProgress = document.getElementById('loading-progress');
 
@@ -521,6 +616,19 @@
         initializeWasm();
 
         // UI Interactions
+        modeSwitch.addEventListener('change', (e) => {
+            isPolygonMode = e.target.checked;
+            clearSelection();
+            
+            if (isPolygonMode) {
+                selectionBox.classList.add('hidden');
+                polygonSvg.classList.remove('hidden');
+            } else {
+                selectionBox.classList.remove('hidden'); // Logic in updateSelectionUI will handle visibility
+                polygonSvg.classList.add('hidden');
+            }
+        });
+
         uploadPlaceholder.addEventListener('click', () => fileInput.click());
         btnAction.addEventListener('click', () => {
             if (sourceImg.classList.contains('hidden')) {
@@ -621,7 +729,10 @@
             selection = null;
             isDrawing = false;
             startPos = null;
+            polygonPoints = [];
+            draggedPointIndex = -1;
             updateSelectionUI();
+            updatePolygonUI();
         }
 
         function updateSelectionContainerSize() {
@@ -652,43 +763,149 @@
         }
 
         function handleMouseDown(e) {
-            console.log('handleMouseDown called');
             if (!sourceImg.src || isProcessing) return;
+            // Allow event to propagate if it's a double click on a point (handled by point listener)
+            // But this is mousedown. Double click is separate.
+            
             e.preventDefault();
             e.stopPropagation();
             
             const coords = getRelativeCoords(e);
-            console.log('Mouse down coords:', coords);
-            startPos = coords;
-            isDrawing = true;
-            selection = { x: coords.x, y: coords.y, w: 0, h: 0 };
-            updateSelectionUI();
+            
+            if (isPolygonMode) {
+                // Check if clicking on an existing point via target or coordinates
+                let index = -1;
+                
+                // First check if we clicked a point element
+                if (e.target.classList.contains('polygon-point')) {
+                    // Find which point it corresponds to
+                    // We can store index in dataset, or just search coordinates
+                     const points = document.querySelectorAll('.polygon-point');
+                     for(let i=0; i<points.length; i++) {
+                         if(points[i] === e.target) {
+                             index = i;
+                             break;
+                         }
+                     }
+                }
+                
+                // Fallback to coordinate search if not hit directly (e.g. near miss)
+                if (index === -1) {
+                    const clickRadius = 10;
+                    index = polygonPoints.findIndex(p => 
+                        Math.abs(p.x - coords.x) < clickRadius && Math.abs(p.y - coords.y) < clickRadius
+                    );
+                }
+                
+                draggedPointIndex = index;
+
+                if (draggedPointIndex !== -1) {
+                    // Start dragging existing point
+                    isDrawing = true;
+                } else {
+                    // Add new point
+                    polygonPoints.push(coords);
+                    draggedPointIndex = polygonPoints.length - 1;
+                    isDrawing = true; 
+                    updatePolygonUI();
+                }
+            } else {
+                startPos = coords;
+                isDrawing = true;
+                selection = { x: coords.x, y: coords.y, w: 0, h: 0 };
+                updateSelectionUI();
+            }
         }
 
         function handleMouseMove(e) {
-            if (!isDrawing || !startPos) return;
+            if (!isDrawing) return;
             e.preventDefault();
             
             const coords = getRelativeCoords(e);
-            const x = Math.min(coords.x, startPos.x);
-            const y = Math.min(coords.y, startPos.y);
-            const w = Math.abs(coords.x - startPos.x);
-            const h = Math.abs(coords.y - startPos.y);
             
-            selection = { x, y, w, h };
-            updateSelectionUI();
+            if (isPolygonMode) {
+                if (draggedPointIndex !== -1) {
+                    polygonPoints[draggedPointIndex] = coords;
+                    updatePolygonUI();
+                }
+            } else {
+                if (!startPos) return;
+                const x = Math.min(coords.x, startPos.x);
+                const y = Math.min(coords.y, startPos.y);
+                const w = Math.abs(coords.x - startPos.x);
+                const h = Math.abs(coords.y - startPos.y);
+                
+                selection = { x, y, w, h };
+                updateSelectionUI();
+            }
         }
 
         function handleMouseUp() {
-            if (isDrawing && selection && (selection.w < 5 || selection.h < 5)) {
-                // If selection is too small, treat as a click and clear selection
-                clearSelection();
+            if (isPolygonMode) {
+                draggedPointIndex = -1;
+                isDrawing = false;
+            } else {
+                if (isDrawing && selection && (selection.w < 5 || selection.h < 5)) {
+                    // If selection is too small, treat as a click and clear selection
+                    clearSelection();
+                }
+                isDrawing = false;
+                startPos = null;
             }
-            isDrawing = false;
-            startPos = null;
+        }
+
+        function deletePoint(index) {
+            polygonPoints.splice(index, 1);
+            updatePolygonUI();
+        }
+
+        function updatePolygonUI() {
+            if (polygonPoints.length > 0) {
+                // Show polygon container
+                polygonSvg.classList.remove('hidden');
+                
+                // Update SVG polygon points
+                const pointsStr = polygonPoints.map(p => `${p.x},${p.y}`).join(' ');
+                polygonShape.setAttribute('points', pointsStr);
+                
+                // Update points DOM
+                polygonPointsContainer.innerHTML = '';
+                polygonPoints.forEach((p, index) => {
+                    const pointEl = document.createElement('div');
+                    pointEl.className = 'polygon-point';
+                    pointEl.style.left = p.x + 'px';
+                    pointEl.style.top = p.y + 'px';
+                    
+                    // Add double click to delete
+                    pointEl.addEventListener('dblclick', (e) => {
+                        e.stopPropagation();
+                        deletePoint(index);
+                    });
+                    
+                    // Add mousedown for dragging (handled by container but we need to identify index)
+                    // Actually container's mousedown handles finding the point by distance, which is simpler
+                    // but adding explicit listener might be more robust if points overlap. 
+                    // Let's stick to the distance check in handleMouseDown for simplicity as implemented above.
+                    
+                    polygonPointsContainer.appendChild(pointEl);
+                });
+
+                // Show clear button
+                btnClearSelection.classList.remove('hidden');
+            } else {
+                 polygonShape.setAttribute('points', "");
+                 polygonPointsContainer.innerHTML = '';
+                 // Keep SVG visible if mode is polygon, but maybe hide if empty? 
+                 // It needs to be visible to capture clicks if it was overlaying, but selection-container captures clicks.
+                 // The svg is pointer-events: none, so it's fine.
+                 
+                 btnClearSelection.classList.add('hidden');
+            }
         }
 
         function updateSelectionUI() {
+            if (isPolygonMode) return; // Don't update rect UI in polygon mode
+            
             if (selection && selection.w > 0 && selection.h > 0) {
                 // Show selection box
                 selectionBox.classList.remove('hidden');
@@ -702,7 +919,7 @@
                 selectionTooltip.classList.add('hidden');
                 
                 // Update mode indicator
-                modeText.textContent = "模式: 手动框选";
+                // modeText.textContent = "模式: 手动框选"; // Removed as modeText is gone
                 btnClearSelection.classList.remove('hidden');
             } else {
                 // Hide selection
@@ -711,7 +928,7 @@
                 selectionTooltip.classList.remove('hidden');
                 
                 // Update mode indicator
-                modeText.textContent = "模式: 自动检测";
+                // modeText.textContent = "模式: 自动检测"; // Removed
                 btnClearSelection.classList.add('hidden');
             }
         }
@@ -739,7 +956,26 @@
                 // Calculate selection in actual image pixels
                 let cropX = 0, cropY = 0, cropW = 0, cropH = 0;
                 
-                if (selection && selection.w > 0 && selection.h > 0) {
+                let activeSelection = selection;
+                
+                if (isPolygonMode && polygonPoints.length >= 3) {
+                    // Calculate bounding box of polygon
+                    const xs = polygonPoints.map(p => p.x);
+                    const ys = polygonPoints.map(p => p.y);
+                    const minX = Math.min(...xs);
+                    const maxX = Math.max(...xs);
+                    const minY = Math.min(...ys);
+                    const maxY = Math.max(...ys);
+                    
+                    activeSelection = {
+                        x: minX,
+                        y: minY,
+                        w: maxX - minX,
+                        h: maxY - minY
+                    };
+                }
+                
+                if (activeSelection && activeSelection.w > 0 && activeSelection.h > 0) {
                     // Get the displayed image dimensions and container dimensions
                     const imgRect = sourceImg.getBoundingClientRect();
                     const containerRect = selectionContainer.getBoundingClientRect();
@@ -756,10 +992,10 @@
                     const offsetY = imgRect.top - containerRect.top;
                     
                     // Map selection to image coordinates
-                    cropX = Math.floor((selection.x - offsetX) * scaleX);
-                    cropY = Math.floor((selection.y - offsetY) * scaleY);
-                    cropW = Math.floor(selection.w * scaleX);
-                    cropH = Math.floor(selection.h * scaleY);
+                    cropX = Math.floor((activeSelection.x - offsetX) * scaleX);
+                    cropY = Math.floor((activeSelection.y - offsetY) * scaleY);
+                    cropW = Math.floor(activeSelection.w * scaleX);
+                    cropH = Math.floor(activeSelection.h * scaleY);
                     
                     // Ensure values are within bounds of the actual image
                     cropX = Math.max(0, Math.min(cropX, naturalWidth));
