@@ -762,6 +762,55 @@
             };
         }
 
+        function checkSelfIntersection(newPoint, indexToUpdate) {
+            // Create a temporary array with the proposed point
+            const tempPoints = [...polygonPoints];
+            
+            if (indexToUpdate !== undefined) {
+                 tempPoints[indexToUpdate] = newPoint;
+            } else {
+                 tempPoints.push(newPoint);
+            }
+            
+            const n = tempPoints.length;
+            if (n < 4) return false;
+
+            // Simple O(N^2) check
+            for (let i = 0; i < n; i++) {
+                // Segment 1: p[i] -> p[i+1]
+                const p1 = tempPoints[i];
+                const p2 = tempPoints[(i + 1) % n];
+
+                for (let j = i + 2; j < n; j++) {
+                     // If i=0, adjacent previous segment is n-1 -> 0
+                     // So if i=0, we must not check against segment j=n-1
+                     if (i === 0 && j === n - 1) continue;
+                     
+                     const p3 = tempPoints[j];
+                     const p4 = tempPoints[(j + 1) % n];
+                     
+                     if (doSegmentsIntersect(p1, p2, p3, p4)) {
+                         return true;
+                     }
+                }
+            }
+            return false;
+        }
+
+        // Robust Segment Intersection helper
+        function doSegmentsIntersect(p1, p2, p3, p4) {
+            function ccw(a, b, c) {
+                return (c.y - a.y) * (b.x - a.x) > (b.y - a.y) * (c.x - a.x);
+            }
+            
+            const ccw1 = ccw(p1, p3, p4);
+            const ccw2 = ccw(p2, p3, p4);
+            const ccw3 = ccw(p1, p2, p3);
+            const ccw4 = ccw(p1, p2, p4);
+            
+            return (ccw1 !== ccw2) && (ccw3 !== ccw4);
+        }
+
         function handleMouseDown(e) {
             if (!sourceImg.src || isProcessing) return;
             // Allow event to propagate if it's a double click on a point (handled by point listener)
@@ -803,6 +852,13 @@
                     // Start dragging existing point
                     isDrawing = true;
                 } else {
+                    // Check intersection before adding
+                    if (checkSelfIntersection(coords, undefined)) {
+                        // Visual feedback for invalid placement?
+                        // For now just block
+                        return;
+                    }
+
                     // Add new point
                     polygonPoints.push(coords);
                     draggedPointIndex = polygonPoints.length - 1;
@@ -825,6 +881,26 @@
             
             if (isPolygonMode) {
                 if (draggedPointIndex !== -1) {
+                    // Check intersection before moving
+                    // We don't block movement because it feels unresponsive, but we show invalid state
+                    // And prevent submission/usage if invalid?
+                    // User said "multiple lines cannot have intersection", so preventing is safer.
+                    // But blocking completely means you can't drag "through" a bad state to a good one?
+                    // Usually we block the update to the points array but visual feedback is tricky.
+                    // Let's block the update of the point position if it causes intersection.
+                    
+                    if (checkSelfIntersection(coords, draggedPointIndex)) {
+                        polygonShape.setAttribute('stroke', 'red');
+                        // Optional: don't update point position
+                        // return; 
+                        // If we return here, the point stays where it was valid.
+                        // But the mouse keeps moving.
+                        // This effectively acts as a wall.
+                        return;
+                    } else {
+                        polygonShape.setAttribute('stroke', '#e8a798');
+                    }
+                    
                     polygonPoints[draggedPointIndex] = coords;
                     updatePolygonUI();
                 }
