@@ -1,0 +1,7 @@
+{
+  "name": "rembg_wasm_app",
+  "assets": {
+    "directory": ".",
+    "notFoundStrategy": "404Page"
+  }
+}
