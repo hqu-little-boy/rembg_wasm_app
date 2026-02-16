@@ -1126,8 +1126,9 @@
                         canvas.height = naturalHeight;
                         const ctx = canvas.getContext('2d');
                         
-                        // Clear canvas (default is transparent)
-                        ctx.clearRect(0, 0, naturalWidth, naturalHeight);
+                        // Fill with white background
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, naturalWidth, naturalHeight);
 
                         // Draw the polygon path
                         ctx.beginPath();
@@ -1156,7 +1157,7 @@
                         ctx.restore();
 
                         // Convert back to blob/buffer
-                        const maskedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                        const maskedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg')); // Use JPEG for white bg? Or PNG is fine. PNG supports white.
                         const maskedBuffer = await maskedBlob.arrayBuffer();
                         maskedUint8Array = new Uint8Array(maskedBuffer);
                     }
