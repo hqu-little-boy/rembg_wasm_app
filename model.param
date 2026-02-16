@@ -1,0 +1,328 @@
+7767517
+326 398
+Input                    in0                      0 1 in0
+Convolution              conv_45                  1 1 in0 1 0=64 1=3 11=3 12=1 13=2 14=1 2=1 3=2 4=1 5=1 6=1728
+Convolution              convrelu_0               1 1 1 2 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=36864 9=1
+Split                    splitncnn_0              1 2 2 3 4
+Convolution              convrelu_1               1 1 4 5 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=18432 9=1
+Split                    splitncnn_1              1 2 5 6 7
+Pooling                  maxpool2d_164            1 1 7 8 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_2               1 1 8 9 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=9216 9=1
+Split                    splitncnn_2              1 2 9 10 11
+Pooling                  maxpool2d_165            1 1 11 12 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_3               1 1 12 13 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=9216 9=1
+Split                    splitncnn_3              1 2 13 14 15
+Pooling                  maxpool2d_166            1 1 15 16 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_4               1 1 16 17 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=9216 9=1
+Split                    splitncnn_4              1 2 17 18 19
+Pooling                  maxpool2d_167            1 1 19 20 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_5               1 1 20 21 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=9216 9=1
+Split                    splitncnn_5              1 2 21 22 23
+Pooling                  maxpool2d_168            1 1 23 24 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_6               1 1 24 25 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=9216 9=1
+Split                    splitncnn_6              1 2 25 26 27
+Convolution              convrelu_7               1 1 27 28 0=32 1=3 11=3 12=2 13=1 14=2 2=2 3=1 4=2 5=1 6=9216 9=1
+Concat                   cat_0                    2 1 28 26 29 0=0
+Convolution              convrelu_8               1 1 29 30 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=18432 9=1
+Interp                   upsample_6               1 1 30 31 0=2 3=32 4=32 6=0
+Concat                   cat_1                    2 1 31 22 32 0=0
+Convolution              convrelu_9               1 1 32 33 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=18432 9=1
+Interp                   upsample_7               1 1 33 34 0=2 3=64 4=64 6=0
+Concat                   cat_2                    2 1 34 18 35 0=0
+Convolution              convrelu_10              1 1 35 36 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=18432 9=1
+Interp                   upsample_8               1 1 36 37 0=2 3=128 4=128 6=0
+Concat                   cat_3                    2 1 37 14 38 0=0
+Convolution              convrelu_11              1 1 38 39 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=18432 9=1
+Interp                   upsample_9               1 1 39 40 0=2 3=256 4=256 6=0
+Concat                   cat_4                    2 1 40 10 41 0=0
+Convolution              convrelu_12              1 1 41 42 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=18432 9=1
+Interp                   upsample_10              1 1 42 43 0=2 3=512 4=512 6=0
+Concat                   cat_5                    2 1 43 6 44 0=0
+Convolution              convrelu_13              1 1 44 45 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=36864 9=1
+BinaryOp                 add_0                    2 1 45 3 46 0=0
+Split                    splitncnn_7              1 2 46 47 48
+Pooling                  maxpool2d_169            1 1 48 49 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_14              1 1 49 50 0=128 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=73728 9=1
+Split                    splitncnn_8              1 2 50 51 52
+Convolution              convrelu_15              1 1 52 53 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=36864 9=1
+Split                    splitncnn_9              1 2 53 54 55
+Pooling                  maxpool2d_170            1 1 55 56 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_16              1 1 56 57 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=9216 9=1
+Split                    splitncnn_10             1 2 57 58 59
+Pooling                  maxpool2d_171            1 1 59 60 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_17              1 1 60 61 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=9216 9=1
+Split                    splitncnn_11             1 2 61 62 63
+Pooling                  maxpool2d_172            1 1 63 64 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_18              1 1 64 65 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=9216 9=1
+Split                    splitncnn_12             1 2 65 66 67
+Pooling                  maxpool2d_173            1 1 67 68 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_19              1 1 68 69 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=9216 9=1
+Split                    splitncnn_13             1 2 69 70 71
+Convolution              convrelu_20              1 1 71 72 0=32 1=3 11=3 12=2 13=1 14=2 2=2 3=1 4=2 5=1 6=9216 9=1
+Concat                   cat_6                    2 1 72 70 73 0=0
+Convolution              convrelu_21              1 1 73 74 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=18432 9=1
+Interp                   upsample_11              1 1 74 75 0=2 3=32 4=32 6=0
+Concat                   cat_7                    2 1 75 66 76 0=0
+Convolution              convrelu_22              1 1 76 77 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=18432 9=1
+Interp                   upsample_12              1 1 77 78 0=2 3=64 4=64 6=0
+Concat                   cat_8                    2 1 78 62 79 0=0
+Convolution              convrelu_23              1 1 79 80 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=18432 9=1
+Interp                   upsample_13              1 1 80 81 0=2 3=128 4=128 6=0
+Concat                   cat_9                    2 1 81 58 82 0=0
+Convolution              convrelu_24              1 1 82 83 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=18432 9=1
+Interp                   upsample_14              1 1 83 84 0=2 3=256 4=256 6=0
+Concat                   cat_10                   2 1 84 54 85 0=0
+Convolution              convrelu_25              1 1 85 86 0=128 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=73728 9=1
+BinaryOp                 add_1                    2 1 86 51 87 0=0
+Split                    splitncnn_14             1 2 87 88 89
+Pooling                  maxpool2d_174            1 1 89 90 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_26              1 1 90 91 0=256 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=294912 9=1
+Split                    splitncnn_15             1 2 91 92 93
+Convolution              convrelu_27              1 1 93 94 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=147456 9=1
+Split                    splitncnn_16             1 2 94 95 96
+Pooling                  maxpool2d_175            1 1 96 97 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_28              1 1 97 98 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=36864 9=1
+Split                    splitncnn_17             1 2 98 99 100
+Pooling                  maxpool2d_176            1 1 100 101 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_29              1 1 101 102 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=36864 9=1
+Split                    splitncnn_18             1 2 102 103 104
+Pooling                  maxpool2d_177            1 1 104 105 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_30              1 1 105 106 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=36864 9=1
+Split                    splitncnn_19             1 2 106 107 108
+Convolution              convrelu_31              1 1 108 109 0=64 1=3 11=3 12=2 13=1 14=2 2=2 3=1 4=2 5=1 6=36864 9=1
+Concat                   cat_11                   2 1 109 107 110 0=0
+Convolution              convrelu_32              1 1 110 111 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=73728 9=1
+Interp                   upsample_15              1 1 111 112 0=2 3=32 4=32 6=0
+Concat                   cat_12                   2 1 112 103 113 0=0
+Convolution              convrelu_33              1 1 113 114 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=73728 9=1
+Interp                   upsample_16              1 1 114 115 0=2 3=64 4=64 6=0
+Concat                   cat_13                   2 1 115 99 116 0=0
+Convolution              convrelu_34              1 1 116 117 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=73728 9=1
+Interp                   upsample_17              1 1 117 118 0=2 3=128 4=128 6=0
+Concat                   cat_14                   2 1 118 95 119 0=0
+Convolution              convrelu_35              1 1 119 120 0=256 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=294912 9=1
+BinaryOp                 add_2                    2 1 120 92 121 0=0
+Split                    splitncnn_20             1 2 121 122 123
+Pooling                  maxpool2d_178            1 1 123 124 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_36              1 1 124 125 0=512 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=1179648 9=1
+Split                    splitncnn_21             1 2 125 126 127
+Convolution              convrelu_37              1 1 127 128 0=128 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=589824 9=1
+Split                    splitncnn_22             1 2 128 129 130
+Pooling                  maxpool2d_179            1 1 130 131 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_38              1 1 131 132 0=128 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=147456 9=1
+Split                    splitncnn_23             1 2 132 133 134
+Pooling                  maxpool2d_180            1 1 134 135 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_39              1 1 135 136 0=128 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=147456 9=1
+Split                    splitncnn_24             1 2 136 137 138
+Convolution              convrelu_40              1 1 138 139 0=128 1=3 11=3 12=2 13=1 14=2 2=2 3=1 4=2 5=1 6=147456 9=1
+Concat                   cat_15                   2 1 139 137 140 0=0
+Convolution              convrelu_41              1 1 140 141 0=128 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=294912 9=1
+Interp                   upsample_18              1 1 141 142 0=2 3=32 4=32 6=0
+Concat                   cat_16                   2 1 142 133 143 0=0
+Convolution              convrelu_42              1 1 143 144 0=128 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=294912 9=1
+Interp                   upsample_19              1 1 144 145 0=2 3=64 4=64 6=0
+Concat                   cat_17                   2 1 145 129 146 0=0
+Convolution              convrelu_43              1 1 146 147 0=512 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=1179648 9=1
+BinaryOp                 add_3                    2 1 147 126 148 0=0
+Split                    splitncnn_25             1 2 148 149 150
+Pooling                  maxpool2d_181            1 1 150 151 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_44              1 1 151 152 0=512 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=2359296 9=1
+Split                    splitncnn_26             1 2 152 153 154
+Convolution              convrelu_45              1 1 154 155 0=256 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=1179648 9=1
+Split                    splitncnn_27             1 2 155 156 157
+Convolution              convrelu_46              1 1 157 158 0=256 1=3 11=3 12=2 13=1 14=2 2=2 3=1 4=2 5=1 6=589824 9=1
+Split                    splitncnn_28             1 2 158 159 160
+Convolution              convrelu_47              1 1 160 161 0=256 1=3 11=3 12=4 13=1 14=4 2=4 3=1 4=4 5=1 6=589824 9=1
+Split                    splitncnn_29             1 2 161 162 163
+Convolution              convrelu_48              1 1 163 164 0=256 1=3 11=3 12=8 13=1 14=8 2=8 3=1 4=8 5=1 6=589824 9=1
+Concat                   cat_18                   2 1 164 162 165 0=0
+Convolution              convrelu_49              1 1 165 166 0=256 1=3 11=3 12=4 13=1 14=4 2=4 3=1 4=4 5=1 6=1179648 9=1
+Concat                   cat_19                   2 1 166 159 167 0=0
+Convolution              convrelu_50              1 1 167 168 0=256 1=3 11=3 12=2 13=1 14=2 2=2 3=1 4=2 5=1 6=1179648 9=1
+Concat                   cat_20                   2 1 168 156 169 0=0
+Convolution              convrelu_51              1 1 169 170 0=512 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=2359296 9=1
+BinaryOp                 add_4                    2 1 170 153 171 0=0
+Split                    splitncnn_30             1 2 171 172 173
+Pooling                  maxpool2d_182            1 1 173 174 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_52              1 1 174 175 0=512 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=2359296 9=1
+Split                    splitncnn_31             1 2 175 176 177
+Convolution              convrelu_53              1 1 177 178 0=256 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=1179648 9=1
+Split                    splitncnn_32             1 2 178 179 180
+Convolution              convrelu_54              1 1 180 181 0=256 1=3 11=3 12=2 13=1 14=2 2=2 3=1 4=2 5=1 6=589824 9=1
+Split                    splitncnn_33             1 2 181 182 183
+Convolution              convrelu_55              1 1 183 184 0=256 1=3 11=3 12=4 13=1 14=4 2=4 3=1 4=4 5=1 6=589824 9=1
+Split                    splitncnn_34             1 2 184 185 186
+Convolution              convrelu_56              1 1 186 187 0=256 1=3 11=3 12=8 13=1 14=8 2=8 3=1 4=8 5=1 6=589824 9=1
+Concat                   cat_21                   2 1 187 185 188 0=0
+Convolution              convrelu_57              1 1 188 189 0=256 1=3 11=3 12=4 13=1 14=4 2=4 3=1 4=4 5=1 6=1179648 9=1
+Concat                   cat_22                   2 1 189 182 190 0=0
+Convolution              convrelu_58              1 1 190 191 0=256 1=3 11=3 12=2 13=1 14=2 2=2 3=1 4=2 5=1 6=1179648 9=1
+Concat                   cat_23                   2 1 191 179 192 0=0
+Convolution              convrelu_59              1 1 192 193 0=512 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=2359296 9=1
+BinaryOp                 add_5                    2 1 193 176 194 0=0
+Split                    splitncnn_35             1 3 194 out11 196 197
+Interp                   upsample_20              1 1 196 198 0=2 3=32 4=32 6=0
+Concat                   cat_24                   2 1 198 172 199 0=0
+Convolution              convrelu_60              1 1 199 200 0=512 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=4718592 9=1
+Split                    splitncnn_36             1 2 200 201 202
+Convolution              convrelu_61              1 1 202 203 0=256 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=1179648 9=1
+Split                    splitncnn_37             1 2 203 204 205
+Convolution              convrelu_62              1 1 205 206 0=256 1=3 11=3 12=2 13=1 14=2 2=2 3=1 4=2 5=1 6=589824 9=1
+Split                    splitncnn_38             1 2 206 207 208
+Convolution              convrelu_63              1 1 208 209 0=256 1=3 11=3 12=4 13=1 14=4 2=4 3=1 4=4 5=1 6=589824 9=1
+Split                    splitncnn_39             1 2 209 210 211
+Convolution              convrelu_64              1 1 211 212 0=256 1=3 11=3 12=8 13=1 14=8 2=8 3=1 4=8 5=1 6=589824 9=1
+Concat                   cat_25                   2 1 212 210 213 0=0
+Convolution              convrelu_65              1 1 213 214 0=256 1=3 11=3 12=4 13=1 14=4 2=4 3=1 4=4 5=1 6=1179648 9=1
+Concat                   cat_26                   2 1 214 207 215 0=0
+Convolution              convrelu_66              1 1 215 216 0=256 1=3 11=3 12=2 13=1 14=2 2=2 3=1 4=2 5=1 6=1179648 9=1
+Concat                   cat_27                   2 1 216 204 217 0=0
+Convolution              convrelu_67              1 1 217 218 0=512 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=2359296 9=1
+BinaryOp                 add_6                    2 1 218 201 219 0=0
+Split                    splitncnn_40             1 3 219 out10 221 222
+Interp                   upsample_21              1 1 221 223 0=2 3=64 4=64 6=0
+Concat                   cat_28                   2 1 223 149 224 0=0
+Convolution              convrelu_68              1 1 224 225 0=256 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=2359296 9=1
+Split                    splitncnn_41             1 2 225 226 227
+Convolution              convrelu_69              1 1 227 228 0=128 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=294912 9=1
+Split                    splitncnn_42             1 2 228 229 230
+Pooling                  maxpool2d_183            1 1 230 231 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_70              1 1 231 232 0=128 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=147456 9=1
+Split                    splitncnn_43             1 2 232 233 234
+Pooling                  maxpool2d_184            1 1 234 235 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_71              1 1 235 236 0=128 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=147456 9=1
+Split                    splitncnn_44             1 2 236 237 238
+Convolution              convrelu_72              1 1 238 239 0=128 1=3 11=3 12=2 13=1 14=2 2=2 3=1 4=2 5=1 6=147456 9=1
+Concat                   cat_29                   2 1 239 237 240 0=0
+Convolution              convrelu_73              1 1 240 241 0=128 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=294912 9=1
+Interp                   upsample_22              1 1 241 242 0=2 3=32 4=32 6=0
+Concat                   cat_30                   2 1 242 233 243 0=0
+Convolution              convrelu_74              1 1 243 244 0=128 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=294912 9=1
+Interp                   upsample_23              1 1 244 245 0=2 3=64 4=64 6=0
+Concat                   cat_31                   2 1 245 229 246 0=0
+Convolution              convrelu_75              1 1 246 247 0=256 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=589824 9=1
+BinaryOp                 add_7                    2 1 247 226 248 0=0
+Split                    splitncnn_45             1 3 248 out9 250 251
+Interp                   upsample_24              1 1 250 252 0=2 3=128 4=128 6=0
+Concat                   cat_32                   2 1 252 122 253 0=0
+Convolution              convrelu_76              1 1 253 254 0=128 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=589824 9=1
+Split                    splitncnn_46             1 2 254 255 256
+Convolution              convrelu_77              1 1 256 257 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=73728 9=1
+Split                    splitncnn_47             1 2 257 258 259
+Pooling                  maxpool2d_185            1 1 259 260 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_78              1 1 260 261 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=36864 9=1
+Split                    splitncnn_48             1 2 261 262 263
+Pooling                  maxpool2d_186            1 1 263 264 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_79              1 1 264 265 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=36864 9=1
+Split                    splitncnn_49             1 2 265 266 267
+Pooling                  maxpool2d_187            1 1 267 268 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_80              1 1 268 269 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=36864 9=1
+Split                    splitncnn_50             1 2 269 270 271
+Convolution              convrelu_81              1 1 271 272 0=64 1=3 11=3 12=2 13=1 14=2 2=2 3=1 4=2 5=1 6=36864 9=1
+Concat                   cat_33                   2 1 272 270 273 0=0
+Convolution              convrelu_82              1 1 273 274 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=73728 9=1
+Interp                   upsample_25              1 1 274 275 0=2 3=32 4=32 6=0
+Concat                   cat_34                   2 1 275 266 276 0=0
+Convolution              convrelu_83              1 1 276 277 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=73728 9=1
+Interp                   upsample_26              1 1 277 278 0=2 3=64 4=64 6=0
+Concat                   cat_35                   2 1 278 262 279 0=0
+Convolution              convrelu_84              1 1 279 280 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=73728 9=1
+Interp                   upsample_27              1 1 280 281 0=2 3=128 4=128 6=0
+Concat                   cat_36                   2 1 281 258 282 0=0
+Convolution              convrelu_85              1 1 282 283 0=128 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=147456 9=1
+BinaryOp                 add_8                    2 1 283 255 284 0=0
+Split                    splitncnn_51             1 3 284 out8 286 287
+Interp                   upsample_28              1 1 286 288 0=2 3=256 4=256 6=0
+Concat                   cat_37                   2 1 288 88 289 0=0
+Convolution              convrelu_86              1 1 289 290 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=147456 9=1
+Split                    splitncnn_52             1 2 290 291 292
+Convolution              convrelu_87              1 1 292 293 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=18432 9=1
+Split                    splitncnn_53             1 2 293 294 295
+Pooling                  maxpool2d_188            1 1 295 296 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_88              1 1 296 297 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=9216 9=1
+Split                    splitncnn_54             1 2 297 298 299
+Pooling                  maxpool2d_189            1 1 299 300 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_89              1 1 300 301 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=9216 9=1
+Split                    splitncnn_55             1 2 301 302 303
+Pooling                  maxpool2d_190            1 1 303 304 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_90              1 1 304 305 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=9216 9=1
+Split                    splitncnn_56             1 2 305 306 307
+Pooling                  maxpool2d_191            1 1 307 308 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_91              1 1 308 309 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=9216 9=1
+Split                    splitncnn_57             1 2 309 310 311
+Convolution              convrelu_92              1 1 311 312 0=32 1=3 11=3 12=2 13=1 14=2 2=2 3=1 4=2 5=1 6=9216 9=1
+Concat                   cat_38                   2 1 312 310 313 0=0
+Convolution              convrelu_93              1 1 313 314 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=18432 9=1
+Interp                   upsample_29              1 1 314 315 0=2 3=32 4=32 6=0
+Concat                   cat_39                   2 1 315 306 316 0=0
+Convolution              convrelu_94              1 1 316 317 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=18432 9=1
+Interp                   upsample_30              1 1 317 318 0=2 3=64 4=64 6=0
+Concat                   cat_40                   2 1 318 302 319 0=0
+Convolution              convrelu_95              1 1 319 320 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=18432 9=1
+Interp                   upsample_31              1 1 320 321 0=2 3=128 4=128 6=0
+Concat                   cat_41                   2 1 321 298 322 0=0
+Convolution              convrelu_96              1 1 322 323 0=32 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=18432 9=1
+Interp                   upsample_32              1 1 323 324 0=2 3=256 4=256 6=0
+Concat                   cat_42                   2 1 324 294 325 0=0
+Convolution              convrelu_97              1 1 325 326 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=36864 9=1
+BinaryOp                 add_9                    2 1 326 291 327 0=0
+Split                    splitncnn_58             1 3 327 out7 329 330
+Interp                   upsample_33              1 1 329 331 0=2 3=512 4=512 6=0
+Concat                   cat_43                   2 1 331 47 332 0=0
+Convolution              convrelu_98              1 1 332 333 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=73728 9=1
+Split                    splitncnn_59             1 2 333 334 335
+Convolution              convrelu_99              1 1 335 336 0=16 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=9216 9=1
+Split                    splitncnn_60             1 2 336 337 338
+Pooling                  maxpool2d_192            1 1 338 339 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_100             1 1 339 340 0=16 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=2304 9=1
+Split                    splitncnn_61             1 2 340 341 342
+Pooling                  maxpool2d_193            1 1 342 343 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_101             1 1 343 344 0=16 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=2304 9=1
+Split                    splitncnn_62             1 2 344 345 346
+Pooling                  maxpool2d_194            1 1 346 347 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_102             1 1 347 348 0=16 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=2304 9=1
+Split                    splitncnn_63             1 2 348 349 350
+Pooling                  maxpool2d_195            1 1 350 351 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_103             1 1 351 352 0=16 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=2304 9=1
+Split                    splitncnn_64             1 2 352 353 354
+Pooling                  maxpool2d_196            1 1 354 355 0=0 1=2 11=2 12=2 13=0 2=2 3=0 5=0
+Convolution              convrelu_104             1 1 355 356 0=16 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=2304 9=1
+Split                    splitncnn_65             1 2 356 357 358
+Convolution              convrelu_105             1 1 358 359 0=16 1=3 11=3 12=2 13=1 14=2 2=2 3=1 4=2 5=1 6=2304 9=1
+Concat                   cat_44                   2 1 359 357 360 0=0
+Convolution              convrelu_106             1 1 360 361 0=16 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=4608 9=1
+Interp                   upsample_34              1 1 361 362 0=2 3=32 4=32 6=0
+Concat                   cat_45                   2 1 362 353 363 0=0
+Convolution              convrelu_107             1 1 363 364 0=16 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=4608 9=1
+Interp                   upsample_35              1 1 364 365 0=2 3=64 4=64 6=0
+Concat                   cat_46                   2 1 365 349 366 0=0
+Convolution              convrelu_108             1 1 366 367 0=16 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=4608 9=1
+Interp                   upsample_36              1 1 367 368 0=2 3=128 4=128 6=0
+Concat                   cat_47                   2 1 368 345 369 0=0
+Convolution              convrelu_109             1 1 369 370 0=16 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=4608 9=1
+Interp                   upsample_37              1 1 370 371 0=2 3=256 4=256 6=0
+Concat                   cat_48                   2 1 371 341 372 0=0
+Convolution              convrelu_110             1 1 372 373 0=16 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=4608 9=1
+Interp                   upsample_38              1 1 373 374 0=2 3=512 4=512 6=0
+Concat                   cat_49                   2 1 374 337 375 0=0
+Convolution              convrelu_111             1 1 375 376 0=64 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=18432 9=1
+BinaryOp                 add_10                   2 1 376 334 377 0=0
+Split                    splitncnn_66             1 2 377 out6 379
+Convolution              conv_158                 1 1 379 380 0=1 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=576
+Interp                   upsample_39              1 1 380 381 0=2 3=1024 4=1024 6=0
+Convolution              conv_159                 1 1 330 382 0=1 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=576
+Interp                   upsample_40              1 1 382 383 0=2 3=1024 4=1024 6=0
+Convolution              conv_160                 1 1 287 384 0=1 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=1152
+Interp                   upsample_41              1 1 384 385 0=2 3=1024 4=1024 6=0
+Convolution              conv_161                 1 1 251 386 0=1 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=2304
+Interp                   upsample_42              1 1 386 387 0=2 3=1024 4=1024 6=0
+Convolution              conv_162                 1 1 222 388 0=1 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=4608
+Interp                   upsample_43              1 1 388 389 0=2 3=1024 4=1024 6=0
+Convolution              conv_163                 1 1 197 390 0=1 1=3 11=3 12=1 13=1 14=1 2=1 3=1 4=1 5=1 6=4608
+Interp                   upsample_44              1 1 390 391 0=2 3=1024 4=1024 6=0
+Sigmoid                  sigmoid_0                1 1 381 out0
+Sigmoid                  sigmoid_1                1 1 383 out1
+Sigmoid                  sigmoid_2                1 1 385 out2
+Sigmoid                  sigmoid_3                1 1 387 out3
+Sigmoid                  sigmoid_4                1 1 389 out4
+Sigmoid                  sigmoid_5                1 1 391 out5
