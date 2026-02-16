@@ -501,6 +501,7 @@
         let isPolygonMode = false;
         let polygonPoints = []; // Array of {x, y}
         let draggedPointIndex = -1;
+        let hoverEdgeIndex = -1; // Index of the start point of the hovered edge
 
         // Get DOM elements
         const btnAction = document.getElementById('btn-action');
@@ -523,6 +524,7 @@
         const selectionTooltip = document.getElementById('selection-tooltip');
         const polygonSvg = document.getElementById('polygon-svg');
         const polygonShape = document.getElementById('polygon-shape');
+        const polygonPreviewLine = document.getElementById('polygon-preview-line');
         const polygonPointsContainer = document.getElementById('polygon-points-container');
         const loadingOverlay = document.getElementById('loading-overlay');
         const loadingProgress = document.getElementById('loading-progress');
@@ -811,24 +813,26 @@
             return (ccw1 !== ccw2) && (ccw3 !== ccw4);
         }
 
+        function getDistanceToSegment(p, v, w) {
+            const l2 = (w.x - v.x) ** 2 + (w.y - v.y) ** 2;
+            if (l2 === 0) return Math.sqrt((p.x - v.x) ** 2 + (p.y - v.y) ** 2);
+            let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+            t = Math.max(0, Math.min(1, t));
+            const proj = { x: v.x + t * (w.x - v.x), y: v.y + t * (w.y - v.y) };
+            return Math.sqrt((p.x - proj.x) ** 2 + (p.y - proj.y) ** 2);
+        }
+
         function handleMouseDown(e) {
             if (!sourceImg.src || isProcessing) return;
-            // Allow event to propagate if it's a double click on a point (handled by point listener)
-            // But this is mousedown. Double click is separate.
-            
             e.preventDefault();
             e.stopPropagation();
             
             const coords = getRelativeCoords(e);
             
             if (isPolygonMode) {
-                // Check if clicking on an existing point via target or coordinates
+                // 1. Check if clicking on an existing point
                 let index = -1;
-                
-                // First check if we clicked a point element
                 if (e.target.classList.contains('polygon-point')) {
-                    // Find which point it corresponds to
-                    // We can store index in dataset, or just search coordinates
                      const points = document.querySelectorAll('.polygon-point');
                      for(let i=0; i<points.length; i++) {
                          if(points[i] === e.target) {
@@ -838,7 +842,6 @@
                      }
                 }
                 
-                // Fallback to coordinate search if not hit directly (e.g. near miss)
                 if (index === -1) {
                     const clickRadius = 10;
                     index = polygonPoints.findIndex(p => 
@@ -852,14 +855,38 @@
                     // Start dragging existing point
                     isDrawing = true;
                 } else {
-                    // Check intersection before adding
-                    if (checkSelfIntersection(coords, undefined)) {
-                        // Visual feedback for invalid placement?
-                        // For now just block
+                    // 2. Check if clicking on an edge to insert point
+                    if (hoverEdgeIndex !== -1) {
+                        // Insert new point after hoverEdgeIndex
+                        const insertIndex = hoverEdgeIndex + 1;
+                        
+                        // Check intersection for the two new segments created
+                        // We are replacing edge (p1, p2) with (p1, newPoint, p2)
+                        // It is guaranteed not to self-intersect locally since newPoint is on the edge
+                        // But we should double check just in case logic is weird? 
+                        // Actually, if it's ON the edge, it's fine.
+                        // But what if we drag it immediately?
+                        
+                        if (checkSelfIntersection(coords, undefined)) {
+                             // This check is slightly wrong because undefined means "append to end"
+                             // We are inserting in middle.
+                             // checkSelfIntersection needs to know where we are inserting.
+                             // But let's skip check for initial insertion on edge because it's by definition valid.
+                        }
+                        
+                        polygonPoints.splice(insertIndex, 0, coords);
+                        draggedPointIndex = insertIndex;
+                        isDrawing = true;
+                        hoverEdgeIndex = -1; // Clear hover
+                        updatePolygonUI();
                         return;
                     }
 
-                    // Add new point
+                    // 3. Add new point at the end
+                    if (checkSelfIntersection(coords, undefined)) {
+                        return;
+                    }
+
                     polygonPoints.push(coords);
                     draggedPointIndex = polygonPoints.length - 1;
                     isDrawing = true; 
@@ -874,28 +901,16 @@
         }
 
         function handleMouseMove(e) {
-            if (!isDrawing) return;
+            if (!sourceImg.src) return; // Basic check
             e.preventDefault();
             
             const coords = getRelativeCoords(e);
             
             if (isPolygonMode) {
-                if (draggedPointIndex !== -1) {
+                if (isDrawing && draggedPointIndex !== -1) {
                     // Check intersection before moving
-                    // We don't block movement because it feels unresponsive, but we show invalid state
-                    // And prevent submission/usage if invalid?
-                    // User said "multiple lines cannot have intersection", so preventing is safer.
-                    // But blocking completely means you can't drag "through" a bad state to a good one?
-                    // Usually we block the update to the points array but visual feedback is tricky.
-                    // Let's block the update of the point position if it causes intersection.
-                    
                     if (checkSelfIntersection(coords, draggedPointIndex)) {
                         polygonShape.setAttribute('stroke', 'red');
-                        // Optional: don't update point position
-                        // return; 
-                        // If we return here, the point stays where it was valid.
-                        // But the mouse keeps moving.
-                        // This effectively acts as a wall.
                         return;
                     } else {
                         polygonShape.setAttribute('stroke', '#e8a798');
@@ -903,9 +918,30 @@
                     
                     polygonPoints[draggedPointIndex] = coords;
                     updatePolygonUI();
+                } else if (!isDrawing) {
+                    // Hover detection for edges
+                    let foundEdge = -1;
+                    if (polygonPoints.length >= 2) {
+                        const n = polygonPoints.length;
+                        for (let i = 0; i < n; i++) {
+                            const p1 = polygonPoints[i];
+                            const p2 = polygonPoints[(i + 1) % n];
+                            
+                            const dist = getDistanceToSegment(coords, p1, p2);
+                            if (dist < 10) { // 10px threshold
+                                foundEdge = i;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (foundEdge !== hoverEdgeIndex) {
+                        hoverEdgeIndex = foundEdge;
+                        updatePolygonUI(); 
+                    }
                 }
             } else {
-                if (!startPos) return;
+                if (!isDrawing || !startPos) return;
                 const x = Math.min(coords.x, startPos.x);
                 const y = Math.min(coords.y, startPos.y);
                 const w = Math.abs(coords.x - startPos.x);
@@ -958,22 +994,35 @@
                         deletePoint(index);
                     });
                     
-                    // Add mousedown for dragging (handled by container but we need to identify index)
-                    // Actually container's mousedown handles finding the point by distance, which is simpler
-                    // but adding explicit listener might be more robust if points overlap. 
-                    // Let's stick to the distance check in handleMouseDown for simplicity as implemented above.
-                    
                     polygonPointsContainer.appendChild(pointEl);
                 });
+                
+                // Show edge highlight if hovering
+                if (hoverEdgeIndex !== -1 && !isDrawing) {
+                    const p1 = polygonPoints[hoverEdgeIndex];
+                    const p2 = polygonPoints[(hoverEdgeIndex + 1) % polygonPoints.length];
+                    
+                    polygonPreviewLine.setAttribute('x1', p1.x);
+                    polygonPreviewLine.setAttribute('y1', p1.y);
+                    polygonPreviewLine.setAttribute('x2', p2.x);
+                    polygonPreviewLine.setAttribute('y2', p2.y);
+                    polygonPreviewLine.setAttribute('stroke', '#fbbf24'); // Yellow highlight
+                    polygonPreviewLine.setAttribute('stroke-width', '4');
+                    polygonPreviewLine.classList.remove('hidden');
+                    
+                    // Add cursor hint
+                    selectionContainer.style.cursor = 'copy'; // Indicates adding
+                } else {
+                    polygonPreviewLine.classList.add('hidden');
+                    if(isPolygonMode) selectionContainer.style.cursor = 'crosshair';
+                }
 
                 // Show clear button
                 btnClearSelection.classList.remove('hidden');
             } else {
                  polygonShape.setAttribute('points', "");
                  polygonPointsContainer.innerHTML = '';
-                 // Keep SVG visible if mode is polygon, but maybe hide if empty? 
-                 // It needs to be visible to capture clicks if it was overlaying, but selection-container captures clicks.
-                 // The svg is pointer-events: none, so it's fine.
+                 polygonPreviewLine.classList.add('hidden');
                  
                  btnClearSelection.classList.add('hidden');
             }
