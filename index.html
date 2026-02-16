@@ -1031,49 +1031,102 @@
 
                 // Calculate selection in actual image pixels
                 let cropX = 0, cropY = 0, cropW = 0, cropH = 0;
-                
-                let activeSelection = selection;
-                
+                let maskedUint8Array = uint8Array; // Default to original image
+
                 if (isPolygonMode && polygonPoints.length >= 3) {
-                    // Calculate bounding box of polygon
+                    // 1. Calculate bounding box of polygon
                     const xs = polygonPoints.map(p => p.x);
                     const ys = polygonPoints.map(p => p.y);
                     const minX = Math.min(...xs);
                     const maxX = Math.max(...xs);
                     const minY = Math.min(...ys);
                     const maxY = Math.max(...ys);
-                    
-                    activeSelection = {
+
+                    const activeSelection = {
                         x: minX,
                         y: minY,
                         w: maxX - minX,
                         h: maxY - minY
                     };
-                }
-                
-                if (activeSelection && activeSelection.w > 0 && activeSelection.h > 0) {
-                    // Get the displayed image dimensions and container dimensions
+                    
+                    // 2. Map bounding box to image coordinates
                     const imgRect = sourceImg.getBoundingClientRect();
                     const containerRect = selectionContainer.getBoundingClientRect();
-                    
                     const naturalWidth = sourceImg.naturalWidth;
                     const naturalHeight = sourceImg.naturalHeight;
-                    
-                    // Calculate scale factors
                     const scaleX = naturalWidth / imgRect.width;
                     const scaleY = naturalHeight / imgRect.height;
-                    
-                    // Calculate offset of the image within the container
                     const offsetX = imgRect.left - containerRect.left;
                     const offsetY = imgRect.top - containerRect.top;
-                    
-                    // Map selection to image coordinates
+
                     cropX = Math.floor((activeSelection.x - offsetX) * scaleX);
                     cropY = Math.floor((activeSelection.y - offsetY) * scaleY);
                     cropW = Math.floor(activeSelection.w * scaleX);
                     cropH = Math.floor(activeSelection.h * scaleY);
+
+                    // Ensure values are within bounds
+                    cropX = Math.max(0, Math.min(cropX, naturalWidth));
+                    cropY = Math.max(0, Math.min(cropY, naturalHeight));
+                    cropW = Math.max(0, Math.min(cropW, naturalWidth - cropX));
+                    cropH = Math.max(0, Math.min(cropH, naturalHeight - cropY));
+
+                    // 3. Create a mask canvas to draw the polygon
+                    if (cropW > 0 && cropH > 0) {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = naturalWidth;
+                        canvas.height = naturalHeight;
+                        const ctx = canvas.getContext('2d');
+                        
+                        // Clear canvas (default is transparent)
+                        ctx.clearRect(0, 0, naturalWidth, naturalHeight);
+
+                        // Draw the polygon path
+                        ctx.beginPath();
+                        
+                        // Map all polygon points to image coordinates
+                        const p0 = polygonPoints[0];
+                        const imgX0 = (p0.x - offsetX) * scaleX;
+                        const imgY0 = (p0.y - offsetY) * scaleY;
+                        ctx.moveTo(imgX0, imgY0);
+                        
+                        for(let i=1; i<polygonPoints.length; i++) {
+                            const p = polygonPoints[i];
+                            const imgX = (p.x - offsetX) * scaleX;
+                            const imgY = (p.y - offsetY) * scaleY;
+                            ctx.lineTo(imgX, imgY);
+                        }
+                        ctx.closePath();
+                        
+                        // Clip to the polygon
+                        ctx.save();
+                        ctx.clip();
+                        
+                        // Draw the original image inside the clipped area
+                        const imgBitmap = await createImageBitmap(blob);
+                        ctx.drawImage(imgBitmap, 0, 0);
+                        ctx.restore();
+
+                        // Convert back to blob/buffer
+                        const maskedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                        const maskedBuffer = await maskedBlob.arrayBuffer();
+                        maskedUint8Array = new Uint8Array(maskedBuffer);
+                    }
+                } else if (!isPolygonMode && selection && selection.w > 0 && selection.h > 0) {
+                     // Rectangular selection logic
+                    const imgRect = sourceImg.getBoundingClientRect();
+                    const containerRect = selectionContainer.getBoundingClientRect();
+                    const naturalWidth = sourceImg.naturalWidth;
+                    const naturalHeight = sourceImg.naturalHeight;
+                    const scaleX = naturalWidth / imgRect.width;
+                    const scaleY = naturalHeight / imgRect.height;
+                    const offsetX = imgRect.left - containerRect.left;
+                    const offsetY = imgRect.top - containerRect.top;
                     
-                    // Ensure values are within bounds of the actual image
+                    cropX = Math.floor((selection.x - offsetX) * scaleX);
+                    cropY = Math.floor((selection.y - offsetY) * scaleY);
+                    cropW = Math.floor(selection.w * scaleX);
+                    cropH = Math.floor(selection.h * scaleY);
+                    
                     cropX = Math.max(0, Math.min(cropX, naturalWidth));
                     cropY = Math.max(0, Math.min(cropY, naturalHeight));
                     cropW = Math.max(0, Math.min(cropW, naturalWidth - cropX));
@@ -1083,8 +1136,7 @@
                 // Allow UI to update before heavy processing
                 setTimeout(() => {
                     try {
-                        // TODO: Implement selection handling if we add crop support
-                        const resultU8 = rembgInstance.process(uint8Array, cropX, cropY, cropW, cropH);
+                        const resultU8 = rembgInstance.process(maskedUint8Array, cropX, cropY, cropW, cropH);
                         
                         if (resultU8) {
                             const blob = new Blob([resultU8], { type: 'image/png' });
